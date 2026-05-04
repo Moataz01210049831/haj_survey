@@ -24,8 +24,8 @@ const COMMENTS_MAX = 900;
 
 const UI_STRINGS = {
   title: {
-    ar: 'استبيان الرضا عن الخدمات الطبية - موسم الحج 2025',
-    en: 'Medical Services Satisfaction Survey - Hajj Season 2025',
+    ar: 'استبيان الرضا عن الخدمات الطبية - موسم الحج 2026',
+    en: 'Medical Services Satisfaction Survey - Hajj Season 2026',
   },
   comments: {
     ar: 'تعليقات',
