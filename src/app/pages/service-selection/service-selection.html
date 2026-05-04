@@ -1,0 +1,59 @@
+<div class="page">
+  <header class="top-bar">
+    <div class="top-bar-inner">
+      <img src="logos/moh_vision2030.jpg" alt="Vision 2030" class="logo-vision" />
+      <img src="logos/moh_h.png" alt="Ministry of Health" class="logo-moh" />
+    </div>
+    <div class="green-band" aria-hidden="true"></div>
+  </header>
+
+  <main class="content">
+    <h1 class="title">{{ title() }}</h1>
+    <hr class="divider" />
+
+    <h2 class="facility">{{ facilityName() }}</h2>
+
+    <p class="prompt">{{ prompt() }}</p>
+
+    <ul class="services-grid" role="list">
+      @for (service of services(); track service.id) {
+        <li class="service-item">
+          <button
+            type="button"
+            class="service-button"
+            [attr.aria-label]="serviceName(service)"
+            (click)="select(service)"
+          >
+            {{ serviceName(service) }}
+          </button>
+        </li>
+      }
+    </ul>
+  </main>
+
+  <footer class="page-footer">
+    <div class="footer-left">
+      <div class="health-links">
+        <span class="hl-icon" aria-hidden="true">
+          <svg viewBox="0 0 32 32">
+            <path
+              d="M10 6 L22 6 L22 16 L26 16 L16 26 L6 16 L10 16 Z"
+              fill="#7BAE43"
+            />
+            <circle cx="16" cy="14" r="2.5" fill="#fff" />
+          </svg>
+        </span>
+        <div class="hl-text">
+          <span class="hl-title">HEALTH LINKS</span>
+          <span class="hl-arabic">روابط للخدمات الصحية</span>
+          <span class="hl-powered">Powered by</span>
+          <span class="hl-press">PRESS GANEY</span>
+        </div>
+      </div>
+    </div>
+    <div class="footer-right">
+      <div>&copy; PRESS GANEY ASSOCIATES,INC. All Rights Reserved</div>
+      <div>&copy; 2026 Health.Links.</div>
+    </div>
+  </footer>
+</div>

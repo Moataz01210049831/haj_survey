@@ -1,0 +1,88 @@
+<div class="page">
+  <header class="top-bar">
+    <div class="top-bar-inner">
+      <img src="logos/moh_vision2030.jpg" alt="Vision 2030" class="logo-vision" />
+      <img src="logos/moh_h.png" alt="Ministry of Health" class="logo-moh" />
+    </div>
+    <div class="green-band" aria-hidden="true"></div>
+  </header>
+
+  <main class="content">
+    <h1 class="title">{{ title() }}</h1>
+    <hr class="divider" />
+
+    <form class="survey-form" (ngSubmit)="submit()">
+      @for (question of questions(); track question.id) {
+        <fieldset class="question">
+          <legend class="question-text">{{ questionText(question) }}</legend>
+          <div class="stars" role="radiogroup" [attr.aria-label]="questionText(question)">
+            @for (star of stars; track star) {
+              <button
+                type="button"
+                class="star"
+                [class.filled]="getRating(question.id) >= star"
+                [attr.aria-label]="star + ' / 5'"
+                [attr.aria-checked]="getRating(question.id) === star"
+                role="radio"
+                (click)="setRating(question.id, star)"
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path
+                    d="M12 2.5l2.95 5.98 6.6.96-4.78 4.66 1.13 6.58L12 17.6l-5.9 3.1 1.13-6.58L2.45 9.44l6.6-.96L12 2.5z"
+                  />
+                </svg>
+              </button>
+            }
+          </div>
+        </fieldset>
+      }
+
+      <div class="comments-block">
+        <label class="comments-label" for="survey-comments">{{ commentsLabel() }}</label>
+        <textarea
+          id="survey-comments"
+          class="comments-input"
+          rows="6"
+          [maxlength]="maxChars"
+          [ngModel]="comments()"
+          (ngModelChange)="onCommentsChange($event)"
+          [ngModelOptions]="{ standalone: true }"
+        ></textarea>
+        <div class="char-counter">
+          <span class="char-count">{{ charactersLeft() }}</span>
+          <span>{{ charactersLeftLabel() }}</span>
+        </div>
+      </div>
+
+      <button type="submit" class="submit-button" [disabled]="!canSubmit()">
+        {{ submitLabel() }}
+      </button>
+    </form>
+  </main>
+
+  <footer class="page-footer">
+    <div class="footer-left">
+      <div class="health-links">
+        <span class="hl-icon" aria-hidden="true">
+          <svg viewBox="0 0 32 32">
+            <path
+              d="M10 6 L22 6 L22 16 L26 16 L16 26 L6 16 L10 16 Z"
+              fill="#7BAE43"
+            />
+            <circle cx="16" cy="14" r="2.5" fill="#fff" />
+          </svg>
+        </span>
+        <div class="hl-text">
+          <span class="hl-title">HEALTH LINKS</span>
+          <span class="hl-arabic">روابط للخدمات الصحية</span>
+          <span class="hl-powered">Powered by</span>
+          <span class="hl-press">PRESS GANEY</span>
+        </div>
+      </div>
+    </div>
+    <div class="footer-right">
+      <div>&copy; PRESS GANEY ASSOCIATES,INC. All Rights Reserved</div>
+      <div>&copy; 2026 Health.Links.</div>
+    </div>
+  </footer>
+</div>
