@@ -8,6 +8,23 @@
   </header>
 
   <main class="content">
+    @if (submitted()) {
+      <div class="thank-you">
+        <svg class="thank-you-icon" viewBox="0 0 64 64" aria-hidden="true">
+          <circle cx="32" cy="32" r="30" fill="#1f8d5a" />
+          <path
+            d="M18 32 L28 42 L46 24"
+            fill="none"
+            stroke="#fff"
+            stroke-width="5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+        <h1 class="thank-you-title">{{ thankYouLabel() }}</h1>
+        <p class="thank-you-subtitle">{{ thankYouSubtitleLabel() }}</p>
+      </div>
+    } @else {
     <h1 class="title">{{ title() }}</h1>
     <hr class="divider" />
 
@@ -62,10 +79,19 @@
         </div>
       </div>
 
-      <button type="submit" class="submit-button" [disabled]="!canSubmit()">
+      @if (submitError()) {
+        <p class="submit-error">{{ submitErrorLabel() }}</p>
+      }
+
+      <button
+        type="submit"
+        class="submit-button"
+        [disabled]="!canSubmit() || submitting()"
+      >
         {{ submitLabel() }}
       </button>
     </form>
+    }
     }
   </main>
 

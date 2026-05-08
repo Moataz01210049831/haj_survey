@@ -2,11 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, map } from 'rxjs';
 
-const API_BASE = 'https://portalrcmc.2p.com.sa/haj-surveys-api/api';
-
-// TODO: replace with a proper auth flow once login is wired up.
-const AUTH_TOKEN =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJsaXNhIiwibmJmIjoxNzM5MDI4ODE2LCJleHAiOjE3Mzk2MzM2MTYsImlhdCI6MTczOTAyODgxNn0.sLQamqv3NCvDsEe4wfdjXzPlXC4QxrLYXJzTPcrjpeE';
+import { API_BASE, AUTH_TOKEN } from './api-base';
 
 interface LookupItemDto {
   Name: string;

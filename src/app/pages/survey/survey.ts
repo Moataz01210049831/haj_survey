@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { LookupsService } from '../../services/lookups';
+import { SurveyEntryService } from '../../services/survey-entry';
 
 type LangCode = 'ar' | 'en' | 'fa' | 'fr' | 'in' | 'tr' | 'ml';
 
@@ -40,6 +41,22 @@ const UI_STRINGS = {
     ar: 'إرسال',
     en: 'Submit',
   },
+  submitting: {
+    ar: 'جاري الإرسال…',
+    en: 'Submitting…',
+  },
+  submitError: {
+    ar: 'فشل إرسال الاستبيان. حاول مرة أخرى',
+    en: 'Failed to submit survey. Please try again',
+  },
+  thankYou: {
+    ar: 'شكراً لك',
+    en: 'Thank you',
+  },
+  thankYouSubtitle: {
+    ar: 'تم إرسال استبيانك بنجاح',
+    en: 'Your survey has been submitted successfully',
+  },
   loading: {
     ar: 'جاري تحميل الأسئلة…',
     en: 'Loading questions…',
@@ -66,10 +83,13 @@ export class Survey {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly lookups = inject(LookupsService);
+  private readonly entryService = inject(SurveyEntryService);
 
   protected readonly lang = signal<LangCode>(
     (this.route.snapshot.queryParamMap.get('lang') as LangCode) ?? 'ar',
   );
+  protected readonly languageId =
+    this.route.snapshot.queryParamMap.get('languageId') ?? '';
   protected readonly facilityId =
     this.route.snapshot.queryParamMap.get('facilityId') ?? '';
   protected readonly facilityTypeId =
@@ -80,6 +100,9 @@ export class Survey {
   protected readonly questions = signal<SurveyQuestion[]>([]);
   protected readonly loading = signal<boolean>(true);
   protected readonly loadError = signal<boolean>(false);
+  protected readonly submitting = signal<boolean>(false);
+  protected readonly submitError = signal<boolean>(false);
+  protected readonly submitted = signal<boolean>(false);
 
   protected readonly ratings = signal<Record<string, number>>({});
   protected readonly comments = signal<string>('');
@@ -92,7 +115,14 @@ export class Survey {
   protected readonly charactersLeftLabel = computed(() =>
     this.t(UI_STRINGS.charactersLeft),
   );
-  protected readonly submitLabel = computed(() => this.t(UI_STRINGS.submit));
+  protected readonly submitLabel = computed(() =>
+    this.submitting() ? this.t(UI_STRINGS.submitting) : this.t(UI_STRINGS.submit),
+  );
+  protected readonly submitErrorLabel = computed(() => this.t(UI_STRINGS.submitError));
+  protected readonly thankYouLabel = computed(() => this.t(UI_STRINGS.thankYou));
+  protected readonly thankYouSubtitleLabel = computed(() =>
+    this.t(UI_STRINGS.thankYouSubtitle),
+  );
   protected readonly loadingLabel = computed(() => this.t(UI_STRINGS.loading));
   protected readonly errorLabel = computed(() => this.t(UI_STRINGS.errorLoading));
   protected readonly retryLabel = computed(() => this.t(UI_STRINGS.retry));
@@ -104,7 +134,7 @@ export class Survey {
   protected readonly canSubmit = computed(() => {
     const r = this.ratings();
     const qs = this.questions();
-    return qs.length > 0 && qs.every((q) => r[q.id] > 0);
+    return qs.length > 0 && qs.some((q) => r[q.id] > 0);
   });
 
   constructor() {
@@ -128,23 +158,38 @@ export class Survey {
   }
 
   protected submit(): void {
-    if (!this.canSubmit()) return;
+    if (!this.canSubmit() || this.submitting()) return;
 
-    const submission = {
-      lang: this.lang(),
-      facilityId: this.facilityId,
-      facilityTypeId: this.facilityTypeId,
-      serviceId: this.serviceId,
-      answers: this.questions().map((q) => ({
-        questionId: q.id,
-        rating: this.getRating(q.id),
-      })),
-      comments: this.comments(),
+    const r = this.ratings();
+    const payload = {
+      FacilityId: this.facilityId,
+      ClassificationId: this.serviceId,
+      LanguageId: this.languageId,
+      QuestionAnswers: this.questions()
+        .filter((q) => r[q.id] > 0)
+        .map((q) => ({ QuestionId: q.id, AnswerValue: String(r[q.id]) })),
+      Notes: this.comments(),
     };
 
-    // TODO: POST to API when backend is ready
-    console.log('Survey submission', submission);
-    this.router.navigate(['/'], { queryParams: { submitted: '1' } });
+    this.submitting.set(true);
+    this.submitError.set(false);
+
+    this.entryService.submit(payload).subscribe({
+      next: (res) => {
+        this.submitting.set(false);
+        if (res.Success === false) {
+          console.error('[survey] Submit returned Success=false', res);
+          this.submitError.set(true);
+          return;
+        }
+        this.submitted.set(true);
+      },
+      error: (err) => {
+        console.error('[survey] Submit failed', err);
+        this.submitting.set(false);
+        this.submitError.set(true);
+      },
+    });
   }
 
   private loadQuestions(): void {
