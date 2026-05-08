@@ -51,6 +51,7 @@ export class LanguageSelection {
   protected readonly loading = signal<boolean>(true);
   protected readonly error = signal<string | null>(null);
   protected readonly facilityName = signal<string>('');
+  protected readonly facilityTypeId = signal<string>('');
 
   protected readonly hasLanguages = computed(() => this.languages().length > 0);
 
@@ -65,6 +66,7 @@ export class LanguageSelection {
         lang: language.code,
         languageId: language.id,
         facilityId: this.facilityId,
+        facilityTypeId: this.facilityTypeId(),
       },
     });
   }
@@ -92,7 +94,9 @@ export class LanguageSelection {
   private loadFacility(): void {
     this.lookups.getFacility(this.facilityId, 'ar').subscribe({
       next: (facility) => {
-        if (facility) this.facilityName.set(facility.name);
+        if (!facility) return;
+        this.facilityName.set(facility.name);
+        this.facilityTypeId.set(facility.facilityTypeId ?? '');
       },
       error: (err) => console.error('[language-selection] Facility fetch failed', err),
     });

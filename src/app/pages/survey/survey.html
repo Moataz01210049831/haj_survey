@@ -11,11 +11,19 @@
     <h1 class="title">{{ title() }}</h1>
     <hr class="divider" />
 
+    @if (loading()) {
+      <p class="status">{{ loadingLabel() }}</p>
+    } @else if (loadError()) {
+      <div class="status status-error">
+        <p>{{ errorLabel() }}</p>
+        <button type="button" class="retry-button" (click)="retry()">{{ retryLabel() }}</button>
+      </div>
+    } @else {
     <form class="survey-form" (ngSubmit)="submit()">
       @for (question of questions(); track question.id) {
         <fieldset class="question">
-          <legend class="question-text">{{ questionText(question) }}</legend>
-          <div class="stars" role="radiogroup" [attr.aria-label]="questionText(question)">
+          <legend class="question-text">{{ question.text }}</legend>
+          <div class="stars" role="radiogroup" [attr.aria-label]="question.text">
             @for (star of stars; track star) {
               <button
                 type="button"
@@ -58,6 +66,7 @@
         {{ submitLabel() }}
       </button>
     </form>
+    }
   </main>
 
   <footer class="page-footer">

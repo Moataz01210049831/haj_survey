@@ -15,6 +15,7 @@ interface LookupItemDto {
   ID: string;
   ParentId: string;
   Order: number;
+  FacilityTypeId?: string;
 }
 
 interface LookupResponseDto {
@@ -29,6 +30,7 @@ export interface LookupItem {
   code: string;
   name: string;
   order: number;
+  facilityTypeId?: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -47,6 +49,17 @@ export class LookupsService {
     return this.fetch('facility', { language, params: { entityId } }).pipe(
       map((items) => items[0] ?? null),
     );
+  }
+
+  getQuestions(
+    classificationId: string,
+    facilityTypeId: string,
+    language: string,
+  ): Observable<LookupItem[]> {
+    return this.fetch('question', {
+      language,
+      params: { filter1: classificationId, filter2: facilityTypeId },
+    });
   }
 
   private fetch(
@@ -71,6 +84,7 @@ export class LookupsService {
             code: item.Code,
             name: item.Name,
             order: item.Order,
+            facilityTypeId: item.FacilityTypeId,
           }));
         }),
       );

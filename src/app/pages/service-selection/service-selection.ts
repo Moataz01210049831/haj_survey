@@ -62,6 +62,8 @@ export class ServiceSelection {
     this.route.snapshot.queryParamMap.get('languageId') ?? '';
   protected readonly facilityId =
     this.route.snapshot.queryParamMap.get('facilityId') ?? '';
+  protected readonly facilityTypeId =
+    this.route.snapshot.queryParamMap.get('facilityTypeId') ?? '';
 
   protected readonly services = signal<Service[]>([]);
   protected readonly loading = signal<boolean>(true);
@@ -86,6 +88,7 @@ export class ServiceSelection {
         lang: this.lang(),
         languageId: this.languageId,
         facilityId: this.facilityId,
+        facilityTypeId: this.facilityTypeId,
         service: service.id,
       },
     });
