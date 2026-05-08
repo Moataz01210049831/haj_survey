@@ -134,6 +134,35 @@
   outline-offset: 2px;
 }
 
+.status {
+  font-size: 14px;
+  color: #6f6f6f;
+  margin: 24px 0;
+}
+
+.status-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  color: #b3261e;
+}
+
+.retry-button {
+  padding: 8px 24px;
+  background: #1f8d5a;
+  color: #fff;
+  border: 0;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.retry-button:hover {
+  background: #186f48;
+}
+
 .flag-circle {
   width: 56px;
   height: 56px;

@@ -2,17 +2,16 @@ import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@a
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
-type LangCode = 'ar' | 'en' | 'ur' | 'fr' | 'id' | 'fa' | 'tr' | 'ms';
+type LangCode = 'ar' | 'en' | 'fa' | 'fr' | 'in' | 'tr' | 'ml';
 
 interface LocalizedText {
   ar: string;
   en: string;
-  ur?: string;
-  fr?: string;
-  id?: string;
   fa?: string;
+  fr?: string;
+  in?: string;
   tr?: string;
-  ms?: string;
+  ml?: string;
 }
 
 interface SurveyQuestion {

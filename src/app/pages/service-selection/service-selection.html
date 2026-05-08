@@ -15,20 +15,29 @@
 
     <p class="prompt">{{ prompt() }}</p>
 
-    <ul class="services-grid" role="list">
-      @for (service of services(); track service.id) {
-        <li class="service-item">
-          <button
-            type="button"
-            class="service-button"
-            [attr.aria-label]="serviceName(service)"
-            (click)="select(service)"
-          >
-            {{ serviceName(service) }}
-          </button>
-        </li>
-      }
-    </ul>
+    @if (loading()) {
+      <p class="status">{{ loadingLabel() }}</p>
+    } @else if (loadError()) {
+      <div class="status status-error">
+        <p>{{ errorLabel() }}</p>
+        <button type="button" class="retry-button" (click)="retry()">{{ retryLabel() }}</button>
+      </div>
+    } @else {
+      <ul class="services-grid" role="list">
+        @for (service of services(); track service.id) {
+          <li class="service-item">
+            <button
+              type="button"
+              class="service-button"
+              [attr.aria-label]="service.name"
+              (click)="select(service)"
+            >
+              {{ service.name }}
+            </button>
+          </li>
+        }
+      </ul>
+    }
   </main>
 
   <footer class="page-footer">

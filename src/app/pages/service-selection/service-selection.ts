@@ -1,27 +1,23 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
-type LangCode = 'ar' | 'en' | 'ur' | 'fr' | 'id' | 'fa' | 'tr' | 'ms';
+import { LookupsService } from '../../services/lookups';
+
+type LangCode = 'ar' | 'en' | 'fa' | 'fr' | 'in' | 'tr' | 'ml';
 
 interface LocalizedText {
   ar: string;
   en: string;
-  ur?: string;
-  fr?: string;
-  id?: string;
   fa?: string;
+  fr?: string;
+  in?: string;
   tr?: string;
-  ms?: string;
-}
-
-interface Facility {
-  id: string;
-  name: LocalizedText;
+  ml?: string;
 }
 
 interface Service {
   id: string;
-  name: LocalizedText;
+  name: string;
 }
 
 const UI_STRINGS = {
@@ -32,6 +28,18 @@ const UI_STRINGS = {
   prompt: {
     ar: 'الرجاء اختيار الخدمة التي تلقيتها',
     en: 'Please select the service you received',
+  },
+  loading: {
+    ar: 'جاري تحميل الخدمات…',
+    en: 'Loading services…',
+  },
+  errorLoading: {
+    ar: 'فشل تحميل الخدمات',
+    en: 'Failed to load services',
+  },
+  retry: {
+    ar: 'إعادة المحاولة',
+    en: 'Retry',
   },
 } satisfies Record<string, LocalizedText>;
 
@@ -45,47 +53,70 @@ const UI_STRINGS = {
 export class ServiceSelection {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly lookups = inject(LookupsService);
 
   protected readonly lang = signal<LangCode>(
     (this.route.snapshot.queryParamMap.get('lang') as LangCode) ?? 'ar',
   );
+  protected readonly languageId =
+    this.route.snapshot.queryParamMap.get('languageId') ?? '';
   protected readonly facilityId =
-    this.route.snapshot.queryParamMap.get('facilityId') ?? '1';
+    this.route.snapshot.queryParamMap.get('facilityId') ?? '';
 
-  // Mock data — replace with API call keyed by facilityId
-  protected readonly facility = signal<Facility>({
-    id: this.facilityId,
-    name: {
-      ar: 'مستشفى الحرم - المدينة المنورة',
-      en: 'Al-Haram Hospital - Madinah',
-    },
-  });
+  protected readonly services = signal<Service[]>([]);
+  protected readonly loading = signal<boolean>(true);
+  protected readonly loadError = signal<boolean>(false);
 
-  protected readonly services = signal<Service[]>([
-    {
-      id: 'emergency',
-      name: { ar: 'الطوارئ', en: 'Emergency' },
-    },
-    {
-      id: 'inpatient',
-      name: { ar: 'التنويم', en: 'Inpatient' },
-    },
-  ]);
+  protected readonly facilityName = signal<string>('');
 
   protected readonly title = computed(() => this.t(UI_STRINGS.title));
   protected readonly prompt = computed(() => this.t(UI_STRINGS.prompt));
-  protected readonly facilityName = computed(() => this.t(this.facility().name));
+  protected readonly loadingLabel = computed(() => this.t(UI_STRINGS.loading));
+  protected readonly errorLabel = computed(() => this.t(UI_STRINGS.errorLoading));
+  protected readonly retryLabel = computed(() => this.t(UI_STRINGS.retry));
 
-  protected serviceName(service: Service): string {
-    return this.t(service.name);
+  constructor() {
+    this.loadServices();
+    this.loadFacility();
   }
 
   protected select(service: Service): void {
     this.router.navigate(['/survey'], {
       queryParams: {
         lang: this.lang(),
+        languageId: this.languageId,
         facilityId: this.facilityId,
         service: service.id,
+      },
+    });
+  }
+
+  protected retry(): void {
+    this.loadServices();
+  }
+
+  private loadServices(): void {
+    this.loading.set(true);
+    this.loadError.set(false);
+
+    this.lookups.getClassifications(this.lang()).subscribe({
+      next: (items) => {
+        this.services.set(items.map((item) => ({ id: item.id, name: item.name })));
+        this.loading.set(false);
+      },
+      error: () => {
+        this.loadError.set(true);
+        this.loading.set(false);
+      },
+    });
+  }
+
+  private loadFacility(): void {
+    if (!this.facilityId) return;
+
+    this.lookups.getFacility(this.facilityId, this.lang()).subscribe({
+      next: (facility) => {
+        if (facility) this.facilityName.set(facility.name);
       },
     });
   }

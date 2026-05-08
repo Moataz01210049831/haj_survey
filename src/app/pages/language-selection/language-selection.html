@@ -112,30 +112,41 @@
     </h1>
     <hr class="divider" />
 
-    <h2 class="hospital" dir="rtl">مستشفى الحرم - المدينة المنورة</h2>
+    @if (facilityName()) {
+      <h2 class="hospital" dir="rtl">{{ facilityName() }}</h2>
+    }
 
     <p class="prompt">Choose your language:</p>
 
-    <ul class="language-grid" role="list">
-      @for (lang of languages; track lang.code) {
-        <li class="language-item">
-          <button
-            type="button"
-            class="language-button"
-            [attr.aria-label]="lang.nameEnglish"
-            (click)="select(lang)"
-          >
-            <span class="flag-circle">
-              <svg viewBox="0 0 60 40" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-                <use [attr.href]="'#' + lang.flagId"></use>
-              </svg>
-            </span>
-            <span class="language-arabic">{{ lang.nameArabic }}</span>
-            <span class="language-english">{{ lang.nameEnglish }}</span>
-          </button>
-        </li>
-      }
-    </ul>
+    @if (loading()) {
+      <p class="status">Loading languages…</p>
+    } @else if (error()) {
+      <div class="status status-error">
+        <p>{{ error() }}</p>
+        <button type="button" class="retry-button" (click)="retry()">Retry</button>
+      </div>
+    } @else {
+      <ul class="language-grid" role="list">
+        @for (lang of languages(); track lang.id) {
+          <li class="language-item">
+            <button
+              type="button"
+              class="language-button"
+              [attr.aria-label]="lang.nameEnglish"
+              (click)="select(lang)"
+            >
+              <span class="flag-circle">
+                <svg viewBox="0 0 60 40" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+                  <use [attr.href]="'#' + lang.flagId"></use>
+                </svg>
+              </span>
+              <span class="language-arabic">{{ lang.nameArabic }}</span>
+              <span class="language-english">{{ lang.nameEnglish }}</span>
+            </button>
+          </li>
+        }
+      </ul>
+    }
   </main>
 
   <footer class="page-footer">
