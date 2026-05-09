@@ -116,6 +116,12 @@
       <h2 class="hospital" dir="rtl">{{ facilityName() }}</h2>
     }
 
+    @if (notFound()) {
+      <div class="status status-error not-found">
+        <h2 class="not-found-title">404 — Not Found</h2>
+        <p>Missing facility identifier. Please use a valid link.</p>
+      </div>
+    } @else {
     <p class="prompt">Choose your language:</p>
 
     @if (loading()) {
@@ -146,6 +152,7 @@
           </li>
         }
       </ul>
+    }
     }
   </main>
 

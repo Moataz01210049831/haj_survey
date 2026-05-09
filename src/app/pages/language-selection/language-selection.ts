@@ -50,12 +50,18 @@ export class LanguageSelection {
   protected readonly languages = signal<LanguageOption[]>([]);
   protected readonly loading = signal<boolean>(true);
   protected readonly error = signal<string | null>(null);
+  protected readonly notFound = signal<boolean>(false);
   protected readonly facilityName = signal<string>('');
   protected readonly facilityTypeId = signal<string>('');
 
   protected readonly hasLanguages = computed(() => this.languages().length > 0);
 
   constructor() {
+    if (!this.facilityId) {
+      this.notFound.set(true);
+      this.loading.set(false);
+      return;
+    }
     this.loadLanguages();
     this.loadFacility();
   }
