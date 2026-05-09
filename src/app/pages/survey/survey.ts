@@ -146,7 +146,10 @@ export class Survey {
   }
 
   protected setRating(questionId: string, value: number): void {
-    this.ratings.update((r) => ({ ...r, [questionId]: value }));
+    this.ratings.update((r) => ({
+      ...r,
+      [questionId]: r[questionId] === value ? 0 : value,
+    }));
   }
 
   protected onCommentsChange(value: string): void {
