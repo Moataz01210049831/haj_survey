@@ -40,25 +40,37 @@
       @for (question of questions(); track question.id) {
         <fieldset class="question">
           <legend class="question-text">{{ question.text }}</legend>
-          <div class="stars" role="radiogroup" [attr.aria-label]="question.text">
-            @for (star of stars; track star) {
-              <button
-                type="button"
-                class="star"
-                [class.filled]="getRating(question.id) >= star"
-                [attr.aria-label]="star + ' / 5'"
-                [attr.aria-checked]="getRating(question.id) === star"
-                role="radio"
-                (click)="setRating(question.id, star)"
-              >
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path
-                    d="M12 2.5l2.95 5.98 6.6.96-4.78 4.66 1.13 6.58L12 17.6l-5.9 3.1 1.13-6.58L2.45 9.44l6.6-.96L12 2.5z"
-                  />
-                </svg>
-              </button>
-            }
-          </div>
+          @if (isTextQuestion(question.id)) {
+            <input
+              type="text"
+              class="text-answer-input"
+              [maxlength]="textAnswerMax"
+              [ngModel]="getTextAnswer(question.id)"
+              (ngModelChange)="setTextAnswer(question.id, $event)"
+              [ngModelOptions]="{ standalone: true }"
+              [attr.aria-label]="question.text"
+            />
+          } @else {
+            <div class="stars" role="radiogroup" [attr.aria-label]="question.text">
+              @for (star of stars; track star) {
+                <button
+                  type="button"
+                  class="star"
+                  [class.filled]="getRating(question.id) >= star"
+                  [attr.aria-label]="star + ' / 5'"
+                  [attr.aria-checked]="getRating(question.id) === star"
+                  role="radio"
+                  (click)="setRating(question.id, star)"
+                >
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path
+                      d="M12 2.5l2.95 5.98 6.6.96-4.78 4.66 1.13 6.58L12 17.6l-5.9 3.1 1.13-6.58L2.45 9.44l6.6-.96L12 2.5z"
+                    />
+                  </svg>
+                </button>
+              }
+            </div>
+          }
         </fieldset>
       }
 

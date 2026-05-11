@@ -25,6 +25,8 @@ interface SurveyQuestion {
 }
 
 const COMMENTS_MAX = 900;
+const TEXT_INPUT_QUESTION_ID = '6e76c4e5-d14b-f111-b855-0050569709c3';
+const TEXT_ANSWER_MAX = 200;
 
 const UI_STRINGS = {
   title: {
@@ -107,10 +109,12 @@ export class Survey {
   protected readonly submitted = signal<boolean>(false);
 
   protected readonly ratings = signal<Record<string, number>>({});
+  protected readonly textAnswers = signal<Record<string, string>>({});
   protected readonly comments = signal<string>('');
 
   protected readonly stars = [1, 2, 3, 4, 5] as const;
   protected readonly maxChars = COMMENTS_MAX;
+  protected readonly textAnswerMax = TEXT_ANSWER_MAX;
 
   protected readonly title = computed(() => this.t(UI_STRINGS.title));
   protected readonly commentsLabel = computed(() => this.t(UI_STRINGS.comments));
@@ -135,8 +139,14 @@ export class Survey {
 
   protected readonly canSubmit = computed(() => {
     const r = this.ratings();
+    const t = this.textAnswers();
     const qs = this.questions();
-    return qs.length > 0 && qs.some((q) => r[q.id] > 0);
+    return (
+      qs.length > 0 &&
+      qs.some((q) =>
+        this.isTextQuestion(q.id) ? (t[q.id] ?? '').trim().length > 0 : r[q.id] > 0,
+      )
+    );
   });
 
   constructor() {
@@ -154,6 +164,19 @@ export class Survey {
     }));
   }
 
+  protected isTextQuestion(questionId: string): boolean {
+    return questionId === TEXT_INPUT_QUESTION_ID;
+  }
+
+  protected getTextAnswer(questionId: string): string {
+    return this.textAnswers()[questionId] ?? '';
+  }
+
+  protected setTextAnswer(questionId: string, value: string): void {
+    const next = value.slice(0, TEXT_ANSWER_MAX);
+    this.textAnswers.update((t) => ({ ...t, [questionId]: next }));
+  }
+
   protected onCommentsChange(value: string): void {
     this.comments.set(value.slice(0, this.maxChars));
   }
@@ -166,13 +189,22 @@ export class Survey {
     if (!this.canSubmit() || this.submitting()) return;
 
     const r = this.ratings();
+    const t = this.textAnswers();
     const payload = {
       FacilityId: this.facilityId,
       ClassificationId: this.serviceId,
       LanguageId: this.languageId,
       QuestionAnswers: this.questions()
-        .filter((q) => r[q.id] > 0)
-        .map((q) => ({ QuestionId: q.id, AnswerValue: String(r[q.id]) })),
+        .map((q) => {
+          if (this.isTextQuestion(q.id)) {
+            const value = (t[q.id] ?? '').trim();
+            return value ? { QuestionId: q.id, AnswerValue: value } : null;
+          }
+          return r[q.id] > 0
+            ? { QuestionId: q.id, AnswerValue: String(r[q.id]) }
+            : null;
+        })
+        .filter((a): a is { QuestionId: string; AnswerValue: string } => a !== null),
       Notes: this.comments(),
     };
 

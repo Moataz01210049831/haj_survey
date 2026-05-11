@@ -201,6 +201,23 @@
   stroke: #d99a00;
 }
 
+.text-answer-input {
+  width: 100%;
+  max-width: 420px;
+  padding: 10px 12px;
+  border: 1px solid #cfcfcf;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.text-answer-input:focus {
+  outline: 2px solid #1f8d5a;
+  outline-offset: 1px;
+  border-color: #1f8d5a;
+}
+
 /* Comments */
 .comments-block {
   width: 100%;
