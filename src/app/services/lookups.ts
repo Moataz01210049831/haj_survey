@@ -37,8 +37,29 @@ export class LookupsService {
     return this.fetch('language');
   }
 
-  getClassifications(language: string): Observable<LookupItem[]> {
-    return this.fetch('classification', { language });
+  getClassifications(facilityId: string, language: string): Observable<LookupItem[]> {
+    let headers = new HttpHeaders({ Authorization: `Bearer ${AUTH_TOKEN}` });
+    if (language) headers = headers.set('Language', language);
+
+    return this.http
+      .get<LookupResponseDto>(`${API_BASE}/Lookups/classification`, {
+        params: { facilityId },
+        headers,
+      })
+      .pipe(
+        map((res) => {
+          if (!res.Success) {
+            throw new Error(res.Message ?? 'Lookup request failed');
+          }
+          return (res.Data ?? []).map((item) => ({
+            id: item.ID,
+            code: item.Code,
+            name: item.Name,
+            order: item.Order,
+            facilityTypeId: item.FacilityTypeId,
+          }));
+        }),
+      );
   }
 
   getFacility(entityId: string, language: string): Observable<LookupItem | null> {

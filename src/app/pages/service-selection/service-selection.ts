@@ -123,6 +123,7 @@ export class ServiceSelection {
   constructor() {
     effect(() => {
       this.lang();
+      this.facilityId();
       this.loadServices();
       this.loadFacility();
     });
@@ -148,7 +149,7 @@ export class ServiceSelection {
     this.loading.set(true);
     this.loadError.set(false);
 
-    this.lookups.getClassifications(this.lang()).subscribe({
+    this.lookups.getClassifications(this.facilityId(), this.lang()).subscribe({
       next: (items) => {
         this.services.set(items.map((item) => ({ id: item.id, name: item.name })));
         this.loading.set(false);
