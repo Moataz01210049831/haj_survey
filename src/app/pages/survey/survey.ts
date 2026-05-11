@@ -201,7 +201,7 @@ export class Survey {
             return value ? { QuestionId: q.id, AnswerValue: value } : null;
           }
           return r[q.id] > 0
-            ? { QuestionId: q.id, AnswerValue: String(r[q.id]) }
+            ? { QuestionId: q.id, AnswerValue: String((r[q.id] - 1) * 25) }
             : null;
         })
         .filter((a): a is { QuestionId: string; AnswerValue: string } => a !== null),
