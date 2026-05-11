@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 
 import { LookupItem, LookupsService } from '../../services/lookups';
 
-type LangCode = 'ar' | 'en' | 'fa' | 'fr' | 'in' | 'tr' | 'ml';
+type LangCode = 'ar' | 'en' | 'fa' | 'fr' | 'in' | 'tr' | 'ml' | 'ur' | 'hi';
 
 interface LanguageMeta {
   code: LangCode;
@@ -28,6 +28,8 @@ const LANGUAGE_META: Record<string, LanguageMeta> = {
   Indonesian: { code: 'in', nameArabic: 'الأندونيسية', flagId: 'flag-id' },
   Malaysian: { code: 'ml', nameArabic: 'الماليزية', flagId: 'flag-my' },
   Turkish: { code: 'tr', nameArabic: 'التركية', flagId: 'flag-tr' },
+  Urdu: { code: 'ur', nameArabic: 'الأوردو', flagId: 'flag-pk' },
+  Hindi: { code: 'hi', nameArabic: 'الهندية', flagId: 'flag-in' },
 };
 
 @Component({

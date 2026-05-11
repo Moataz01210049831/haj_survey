@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 
 import { LookupsService } from '../../services/lookups';
 
-type LangCode = 'ar' | 'en' | 'fa' | 'fr' | 'in' | 'tr' | 'ml';
+type LangCode = 'ar' | 'en' | 'fa' | 'fr' | 'in' | 'tr' | 'ml' | 'ur' | 'hi';
 
 interface LocalizedText {
   ar: string;
@@ -13,6 +13,8 @@ interface LocalizedText {
   in?: string;
   tr?: string;
   ml?: string;
+  ur?: string;
+  hi?: string;
 }
 
 interface Service {

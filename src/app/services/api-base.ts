@@ -1,4 +1,4 @@
-export const API_BASE = 'https://portalrcmc.2p.com.sa/haj-surveys-api/api';
+export const API_BASE = 'https://937.moh.gov.sa/haj-surveys-api/api';
 
 // TODO: replace with a proper auth flow once login is wired up.
 export const AUTH_TOKEN =
