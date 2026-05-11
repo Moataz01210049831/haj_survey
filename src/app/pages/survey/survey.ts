@@ -27,7 +27,14 @@ interface SurveyQuestion {
 }
 
 const COMMENTS_MAX = 900;
-const TEXT_INPUT_QUESTION_ID = '6e76c4e5-d14b-f111-b855-0050569709c3';
+const TEXT_INPUT_QUESTION_IDS = new Set<string>([
+  '5a3726c2-d14b-f111-b855-0050569709c3',
+  'c9ce82d8-d14b-f111-b855-0050569709c3',
+  '6e76c4e5-d14b-f111-b855-0050569709c3',
+  '6f76c4e5-d14b-f111-b855-0050569709c3',
+  '3d4c96f2-d14b-f111-b855-0050569709c3',
+  '3e4c96f2-d14b-f111-b855-0050569709c3',
+]);
 const TEXT_ANSWER_MAX = 200;
 
 const UI_STRINGS = {
@@ -251,7 +258,7 @@ export class Survey {
   }
 
   protected isTextQuestion(questionId: string): boolean {
-    return questionId === TEXT_INPUT_QUESTION_ID;
+    return TEXT_INPUT_QUESTION_IDS.has(questionId);
   }
 
   protected getTextAnswer(questionId: string): string {
