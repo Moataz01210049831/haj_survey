@@ -1,0 +1,81 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.picker-bar {
+  background: #fff;
+  padding: 16px 16px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.picker-label {
+  margin: 0;
+  font-size: 14px;
+  color: #555;
+}
+
+.picker {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px 14px;
+}
+
+.picker-item {
+  display: flex;
+}
+
+.picker-button {
+  background: transparent;
+  border: 0;
+  padding: 4px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.12s ease;
+}
+
+.picker-button:hover {
+  transform: translateY(-1px);
+}
+
+.picker-button:focus-visible {
+  outline: 2px solid #1f8d5a;
+  outline-offset: 2px;
+}
+
+.picker-button.active {
+  box-shadow: 0 0 0 2px #1f8d5a;
+}
+
+.flag-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: inline-block;
+  border: 1px solid #e0e0e0;
+  background: #ddd;
+}
+
+.flag-circle svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+@media (max-width: 520px) {
+  .flag-circle {
+    width: 30px;
+    height: 30px;
+  }
+}

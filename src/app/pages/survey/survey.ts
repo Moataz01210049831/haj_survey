@@ -1,7 +1,9 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
+import { LanguagePicker } from '../../components/language-picker/language-picker';
 import { LookupsService } from '../../services/lookups';
 import { SurveyEntryService } from '../../services/survey-entry';
 
@@ -78,7 +80,7 @@ const UI_STRINGS = {
 @Component({
   selector: 'app-survey',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, LanguagePicker],
   templateUrl: './survey.html',
   styleUrl: './survey.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -89,17 +91,19 @@ export class Survey {
   private readonly lookups = inject(LookupsService);
   private readonly entryService = inject(SurveyEntryService);
 
-  protected readonly lang = signal<LangCode>(
-    (this.route.snapshot.queryParamMap.get('lang') as LangCode) ?? 'ar',
+  private readonly params = toSignal(this.route.queryParamMap, {
+    initialValue: this.route.snapshot.queryParamMap,
+  });
+
+  protected readonly lang = computed<LangCode>(
+    () => (this.params().get('lang') as LangCode) ?? 'ar',
   );
-  protected readonly languageId =
-    this.route.snapshot.queryParamMap.get('languageId') ?? '';
-  protected readonly facilityId =
-    this.route.snapshot.queryParamMap.get('facilityId') ?? '';
-  protected readonly facilityTypeId =
-    this.route.snapshot.queryParamMap.get('facilityTypeId') ?? '';
-  protected readonly serviceId =
-    this.route.snapshot.queryParamMap.get('service') ?? '';
+  protected readonly languageId = computed(() => this.params().get('languageId') ?? '');
+  protected readonly facilityId = computed(() => this.params().get('facilityId') ?? '');
+  protected readonly facilityTypeId = computed(
+    () => this.params().get('facilityTypeId') ?? '',
+  );
+  protected readonly serviceId = computed(() => this.params().get('service') ?? '');
 
   protected readonly questions = signal<SurveyQuestion[]>([]);
   protected readonly loading = signal<boolean>(true);
@@ -150,7 +154,12 @@ export class Survey {
   });
 
   constructor() {
-    this.loadQuestions();
+    effect(() => {
+      this.lang();
+      this.serviceId();
+      this.facilityTypeId();
+      this.loadQuestions();
+    });
   }
 
   protected getRating(questionId: string): number {
@@ -191,9 +200,9 @@ export class Survey {
     const r = this.ratings();
     const t = this.textAnswers();
     const payload = {
-      FacilityId: this.facilityId,
-      ClassificationId: this.serviceId,
-      LanguageId: this.languageId,
+      FacilityId: this.facilityId(),
+      ClassificationId: this.serviceId(),
+      LanguageId: this.languageId(),
       QuestionAnswers: this.questions()
         .map((q) => {
           if (this.isTextQuestion(q.id)) {
@@ -234,7 +243,7 @@ export class Survey {
     this.loadError.set(false);
 
     this.lookups
-      .getQuestions(this.serviceId, this.facilityTypeId, this.lang())
+      .getQuestions(this.serviceId(), this.facilityTypeId(), this.lang())
       .subscribe({
         next: (items) => {
           this.questions.set(items.map((item) => ({ id: item.id, text: item.name })));

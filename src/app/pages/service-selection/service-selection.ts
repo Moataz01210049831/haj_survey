@@ -1,6 +1,8 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 
+import { LanguagePicker } from '../../components/language-picker/language-picker';
 import { LookupsService } from '../../services/lookups';
 
 type LangCode = 'ar' | 'en' | 'fa' | 'fr' | 'in' | 'tr' | 'ml' | 'ur' | 'hi';
@@ -48,6 +50,7 @@ const UI_STRINGS = {
 @Component({
   selector: 'app-service-selection',
   standalone: true,
+  imports: [LanguagePicker],
   templateUrl: './service-selection.html',
   styleUrl: './service-selection.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -57,15 +60,18 @@ export class ServiceSelection {
   private readonly router = inject(Router);
   private readonly lookups = inject(LookupsService);
 
-  protected readonly lang = signal<LangCode>(
-    (this.route.snapshot.queryParamMap.get('lang') as LangCode) ?? 'ar',
+  private readonly params = toSignal(this.route.queryParamMap, {
+    initialValue: this.route.snapshot.queryParamMap,
+  });
+
+  protected readonly lang = computed<LangCode>(
+    () => (this.params().get('lang') as LangCode) ?? 'ar',
   );
-  protected readonly languageId =
-    this.route.snapshot.queryParamMap.get('languageId') ?? '';
-  protected readonly facilityId =
-    this.route.snapshot.queryParamMap.get('facilityId') ?? '';
-  protected readonly facilityTypeId =
-    this.route.snapshot.queryParamMap.get('facilityTypeId') ?? '';
+  protected readonly languageId = computed(() => this.params().get('languageId') ?? '');
+  protected readonly facilityId = computed(() => this.params().get('facilityId') ?? '');
+  protected readonly facilityTypeId = computed(
+    () => this.params().get('facilityTypeId') ?? '',
+  );
 
   protected readonly services = signal<Service[]>([]);
   protected readonly loading = signal<boolean>(true);
@@ -80,17 +86,20 @@ export class ServiceSelection {
   protected readonly retryLabel = computed(() => this.t(UI_STRINGS.retry));
 
   constructor() {
-    this.loadServices();
-    this.loadFacility();
+    effect(() => {
+      this.lang();
+      this.loadServices();
+      this.loadFacility();
+    });
   }
 
   protected select(service: Service): void {
     this.router.navigate(['/survey'], {
       queryParams: {
         lang: this.lang(),
-        languageId: this.languageId,
-        facilityId: this.facilityId,
-        facilityTypeId: this.facilityTypeId,
+        languageId: this.languageId(),
+        facilityId: this.facilityId(),
+        facilityTypeId: this.facilityTypeId(),
         service: service.id,
       },
     });
@@ -117,9 +126,10 @@ export class ServiceSelection {
   }
 
   private loadFacility(): void {
-    if (!this.facilityId) return;
+    const id = this.facilityId();
+    if (!id) return;
 
-    this.lookups.getFacility(this.facilityId, this.lang()).subscribe({
+    this.lookups.getFacility(id, this.lang()).subscribe({
       next: (facility) => {
         if (facility) this.facilityName.set(facility.name);
       },

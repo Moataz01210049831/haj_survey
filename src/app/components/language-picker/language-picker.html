@@ -1,0 +1,25 @@
+@if (languages().length > 0) {
+  <div class="picker-bar">
+    <p class="picker-label">Choose your language:</p>
+    <ul class="picker" role="list">
+      @for (lang of languages(); track lang.id) {
+        <li class="picker-item">
+          <button
+            type="button"
+            class="picker-button"
+            [class.active]="currentLang() === lang.code"
+            [attr.aria-label]="lang.nameEnglish"
+            [attr.aria-pressed]="currentLang() === lang.code"
+            (click)="select(lang)"
+          >
+            <span class="flag-circle">
+              <svg viewBox="0 0 60 40" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+                <use [attr.href]="'#' + lang.flagId"></use>
+              </svg>
+            </span>
+          </button>
+        </li>
+      }
+    </ul>
+  </div>
+}
