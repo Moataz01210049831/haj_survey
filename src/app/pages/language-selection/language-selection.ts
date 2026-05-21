@@ -9,6 +9,7 @@ interface LanguageMeta {
   code: LangCode;
   nameArabic: string;
   flagId: string;
+  flagImage?: string;
 }
 
 interface LanguageOption {
@@ -17,13 +18,14 @@ interface LanguageOption {
   nameArabic: string;
   nameEnglish: string;
   flagId: string;
+  flagImage?: string;
 }
 
 // Local mapping from API "Code" to display metadata (the API only returns English names + GUID).
 const LANGUAGE_META: Record<string, LanguageMeta> = {
-  Arabic: { code: 'ar', nameArabic: 'العربية', flagId: 'flag-sa' },
-  English: { code: 'en', nameArabic: 'الإنجليزية', flagId: 'flag-gb' },
-  Farsi: { code: 'fa', nameArabic: 'الفارسية', flagId: 'flag-ir' },
+  Arabic: { code: 'ar', nameArabic: 'العربية', flagId: 'flag-sa', flagImage: 'lang/ar.jpeg' },
+  English: { code: 'en', nameArabic: 'الإنجليزية', flagId: 'flag-gb', flagImage: 'lang/en.png' },
+  Farsi: { code: 'fa', nameArabic: 'الفارسية', flagId: 'flag-ir', flagImage: 'lang/fa.jpeg' },
   French: { code: 'fr', nameArabic: 'الفرنسية', flagId: 'flag-fr' },
   Indonesian: { code: 'in', nameArabic: 'الأندونيسية', flagId: 'flag-id' },
   Malaysian: { code: 'ml', nameArabic: 'الماليزية', flagId: 'flag-my' },
@@ -112,7 +114,7 @@ export class LanguageSelection {
 
   private toOptions(items: LookupItem[]): LanguageOption[] {
     return items
-      .map((item) => {
+      .map((item): LanguageOption | null => {
         const meta = LANGUAGE_META[item.code];
         if (!meta) return null;
         return {
@@ -121,6 +123,7 @@ export class LanguageSelection {
           nameArabic: meta.nameArabic,
           nameEnglish: item.name,
           flagId: meta.flagId,
+          flagImage: meta.flagImage,
         };
       })
       .filter((option): option is LanguageOption => option !== null);

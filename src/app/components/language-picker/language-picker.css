@@ -67,10 +67,12 @@
   background: #ddd;
 }
 
-.flag-circle svg {
+.flag-circle svg,
+.flag-circle img {
   width: 100%;
   height: 100%;
   display: block;
+  object-fit: cover;
 }
 
 @media (max-width: 520px) {

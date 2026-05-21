@@ -44,9 +44,13 @@
               (click)="select(lang)"
             >
               <span class="flag-circle">
-                <svg viewBox="0 0 60 40" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-                  <use [attr.href]="'#' + lang.flagId"></use>
-                </svg>
+                @if (lang.flagImage) {
+                  <img [src]="lang.flagImage" [alt]="lang.nameEnglish" />
+                } @else {
+                  <svg viewBox="0 0 60 40" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+                    <use [attr.href]="'#' + lang.flagId"></use>
+                  </svg>
+                }
               </span>
               <span class="language-arabic">{{ lang.nameArabic }}</span>
               <span class="language-english">{{ lang.nameEnglish }}</span>

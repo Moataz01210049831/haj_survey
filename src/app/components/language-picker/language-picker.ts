@@ -9,19 +9,21 @@ type LangCode = 'ar' | 'en' | 'fa' | 'fr' | 'in' | 'tr' | 'ml' | 'ur' | 'hi';
 interface LanguageMeta {
   code: LangCode;
   flagId: string;
+  flagImage?: string;
 }
 
 interface LanguageOption {
   id: string;
   code: LangCode;
   flagId: string;
+  flagImage?: string;
   nameEnglish: string;
 }
 
 const LANGUAGE_META: Record<string, LanguageMeta> = {
-  Arabic: { code: 'ar', flagId: 'flag-sa' },
-  English: { code: 'en', flagId: 'flag-gb' },
-  Farsi: { code: 'fa', flagId: 'flag-ir' },
+  Arabic: { code: 'ar', flagId: 'flag-sa', flagImage: 'lang/ar.jpeg' },
+  English: { code: 'en', flagId: 'flag-gb', flagImage: 'lang/en.png' },
+  Farsi: { code: 'fa', flagId: 'flag-ir', flagImage: 'lang/fa.jpeg' },
   French: { code: 'fr', flagId: 'flag-fr' },
   Indonesian: { code: 'in', flagId: 'flag-id' },
   Malaysian: { code: 'ml', flagId: 'flag-my' },
@@ -55,13 +57,14 @@ export class LanguagePicker {
       next: (items) => {
         this.languages.set(
           items
-            .map((item) => {
+            .map((item): LanguageOption | null => {
               const meta = LANGUAGE_META[item.code];
               if (!meta) return null;
               return {
                 id: item.id,
                 code: meta.code,
                 flagId: meta.flagId,
+                flagImage: meta.flagImage,
                 nameEnglish: item.name,
               };
             })
